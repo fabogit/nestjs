@@ -12,10 +12,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { SerializeInterceptor } from '../interceptors/serialize.interceptor';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { SerializeInterceptor } from '../interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller('auth')
 export class UsersController {
@@ -26,7 +27,7 @@ export class UsersController {
     this.usersService.create(body.email, body.password);
   }
 
-  @UseInterceptors(SerializeInterceptor)
+  @UseInterceptors(new SerializeInterceptor(UserDto))
   @Get('/:id')
   async findUser(@Param('id', ParseIntPipe) id: number) {
     console.log('Handler is running');
