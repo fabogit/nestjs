@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 
@@ -26,5 +30,18 @@ export class AuthService {
     return newUser;
   }
 
-  signin() {}
+  async signin(email: string, password: string) {
+    const [user] = await this.userService.find(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    // check if password === stored password
+    const [salt, storedHash] = user.password.split('.');
+    const hash = (await scrypt(password, salt, 32)) as Buffer;
+    const isWrongPassword = storedHash !== hash.toString('hex');
+    if (isWrongPassword) {
+      throw new BadRequestException('Wrong email/password');
+    }
+    return user;
+  }
 }
