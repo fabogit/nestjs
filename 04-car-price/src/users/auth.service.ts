@@ -11,8 +11,8 @@ export class AuthService {
   constructor(private userService: UsersService) {}
 
   async signup(email: string, password: string) {
-    const user = await this.userService.find(email);
-    if (user.length) {
+    const users = await this.userService.find(email);
+    if (users.length) {
       throw new BadRequestException('Email in use');
     }
     // Gen a 16chars salt
@@ -22,6 +22,8 @@ export class AuthService {
     // Join hashed result and salt togheter
     const newUserPwd = `${salt}.${hash.toString('hex')}`;
     // Create user & save
+    const newUser = await this.userService.create(email, newUserPwd);
+    return newUser;
   }
 
   signin() {}
