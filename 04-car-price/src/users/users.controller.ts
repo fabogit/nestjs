@@ -18,6 +18,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { SignUpUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { CurrentUser } from './decorators/current-users.decorator';
 
 @Serialize(UserDto)
 @Controller('auth')
@@ -27,9 +28,14 @@ export class UsersController {
     private usersService: UsersService,
   ) {}
 
+  // @Get('/whoami')
+  // whoAmI(@Session() session: any) {
+  //   return this.usersService.findOne(session.userId);
+  // }
+
   @Get('/whoami')
-  whoAmI(@Session() session: any) {
-    return this.usersService.findOne(session.userId);
+  whoAmI(@CurrentUser() user: string) {
+    return user;
   }
 
   @Post('/signup')
