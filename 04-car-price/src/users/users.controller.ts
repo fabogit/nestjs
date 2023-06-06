@@ -18,7 +18,7 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { SignUpUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { CurrentUser } from './decorators/current-users.decorator';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @Serialize(UserDto)
 @Controller('auth')
@@ -35,6 +35,7 @@ export class UsersController {
 
   @Get('/whoami')
   whoAmI(@CurrentUser() user: string) {
+    // TODO
     return user;
   }
 
