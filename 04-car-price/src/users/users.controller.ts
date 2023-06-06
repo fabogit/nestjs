@@ -46,6 +46,11 @@ export class UsersController {
     return user;
   }
 
+  @Post('/signout')
+  async sigOut(@Session() session: any) {
+    session.userId = null;
+  }
+
   // @UseInterceptors(new SerializeInterceptor(UserDto))
   @Get('/:id')
   async findUser(@Param('id', ParseIntPipe) id: number) {
