@@ -5,7 +5,6 @@ export const CurrentUser = createParamDecorator(
   // since this decorator will not use args => data: never
   (data: never, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
-    console.log(request.session.userId);
-    return 'user';
+    return request.currentUser;
   },
 );
