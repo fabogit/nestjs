@@ -10,10 +10,22 @@ describe('AuthService', () => {
   let mockUsersService: Partial<UsersService>;
 
   beforeEach(async () => {
+    const users: User[] = [];
     mockUsersService = {
-      find: () => Promise.resolve([]),
-      create: (email: string, password: string) =>
-        Promise.resolve({ id: 1, email, password } as User),
+      find: (email: string) => {
+        const filteredUsers = users.filter((user) => user.email === email);
+        return Promise.resolve(filteredUsers);
+      },
+
+      create: (email: string, password: string) => {
+        const user = {
+          id: Math.floor(Math.random() * 99999),
+          email,
+          password,
+        } as User;
+        users.push(user);
+        return Promise.resolve(user);
+      },
     };
 
     const module = await Test.createTestingModule({
@@ -43,41 +55,35 @@ describe('AuthService', () => {
   });
 
   it('Throws BadRequest if user signs up with email that is in use', async () => {
-    mockUsersService.find = () =>
-      Promise.resolve([
-        { id: 1, email: 'asdf@asdf.com', password: '1' } as User,
-      ]);
-
-    await expect(service.signup('asdf@asdf.com', 'pass')).rejects.toThrow(
+    await service.signup('asdf@asdf.com', 'asdf');
+    await expect(service.signup('asdf@asdf.com', 'asdf')).rejects.toThrow(
       BadRequestException,
     );
   });
 
   it('Throws NotFound if signin is called with an unused email', async () => {
     await expect(
-      service.signin('asdflkj@asdlfkj.com', 'passdflkj'),
+      service.signin('asdflkjddddddddsdf@asdlfkj.com', 'passdflkj'),
     ).rejects.toThrow(NotFoundException);
   });
 
   it('Throws BadRequest if an invalid password is provided', async () => {
-    mockUsersService.find = () =>
-      Promise.resolve([
-        { email: 'asdf@asdf.com', password: 'whatever' } as User,
-      ]);
+    await service.signup('laskdjf@alskdfj.com', 'password');
     await expect(
-      service.signin('laskdjf@alskdfj.com', 'differentpassowrd'),
+      service.signin('laskdjf@alskdfj.com', 'laksdlfkj'),
     ).rejects.toThrow(BadRequestException);
   });
 
   it('Returns a user if correct password is provided', async () => {
-    const saltAndHashedPass =
-      'ce36d5015280bb13.d62aa76f54548dad5b21bbfdb66f3a86fab979a26b7ae90b1fefa15c947b9f6c';
-    mockUsersService.find = () =>
-      Promise.resolve([
-        { email: 'asdf@asdf.com', password: saltAndHashedPass } as User,
-      ]);
+    // const saltAndHashedPass =
+    //   'ce36d5015280bb13.d62aa76f54548dad5b21bbfdb66f3a86fab979a26b7ae90b1fefa15c947b9f6c';
+    // mockUsersService.find = () =>
+    //   Promise.resolve([
+    //     { email: 'asdf@asdf.com', password: saltAndHashedPass } as User,
+    //   ]);
+    await service.signup('user@email.com', 'mypass');
     const user = await service.signin('user@email.com', 'mypass');
-    console.log(user);
+    // console.log(user);
     expect(user).toBeDefined();
   });
 });
