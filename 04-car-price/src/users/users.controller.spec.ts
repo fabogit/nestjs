@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { AuthService } from './auth.service';
 import { User } from './user.entity';
-import { FindRelationsNotFoundError } from 'typeorm';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let mockUserService: Partial<UsersService>;
+  let mockUsersService: Partial<UsersService>;
   let mockAuthService: Partial<AuthService>;
 
   beforeEach(async () => {
@@ -16,7 +16,7 @@ describe('UsersController', () => {
       // signup: (email, password) => {},
       // signin: (email, password) => {},
     };
-    mockUserService = {
+    mockUsersService = {
       find: (email) => {
         return Promise.resolve([
           {
@@ -42,7 +42,7 @@ describe('UsersController', () => {
       providers: [
         {
           provide: UsersService,
-          useValue: mockUserService,
+          useValue: mockUsersService,
         },
         {
           provide: AuthService,
@@ -56,5 +56,25 @@ describe('UsersController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  it('findAllUser return a list of users with the given email', async () => {
+    const email = 'mail@email.com';
+    const users = await controller.findAllUsers(email);
+
+    expect(users.length).toEqual(1);
+    expect(users[0].email).toEqual(email);
+  });
+
+  it('findUser return a single user with the given id', async () => {
+    const id = 1;
+    const users = await controller.findUser(id);
+    expect(users).toBeDefined();
+  });
+
+  it('findUser throws an error if user with given id is not found', async () => {
+    // override method
+    mockUsersService.findOne = () => null;
+    await expect(controller.findUser(1)).rejects.toThrow(NotFoundException);
   });
 });
