@@ -5,7 +5,10 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
+
+import { Report } from '../reports/report.entity';
 
 @Entity()
 export class User {
@@ -17,6 +20,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @OneToMany(() => Report, (report) => report.user)
+  reports: Report[];
 
   // Hooks are executed on entityes
   // do not push to db plain objects, make repository create entity then save/remove
