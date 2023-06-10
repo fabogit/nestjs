@@ -1,6 +1,7 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { Module, ValidationPipe, MiddlewareConsumer } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as session from 'express-session';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -23,6 +24,7 @@ import { Report } from './reports/report.entity';
   controllers: [AppController],
   providers: [
     AppService,
+    // Globally scoped Pipe
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -31,4 +33,17 @@ import { Report } from './reports/report.entity';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  // Globally scoped Middleware
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        session({
+          secret: 'session-secret',
+          resave: false,
+          saveUninitialized: false,
+        }),
+      )
+      .forRoutes('*');
+  }
+}
