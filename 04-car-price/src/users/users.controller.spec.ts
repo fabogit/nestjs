@@ -14,7 +14,9 @@ describe('UsersController', () => {
   beforeEach(async () => {
     mockAuthService = {
       // signup: (email, password) => {},
-      // signin: (email, password) => {},
+      signin: (email, password) => {
+        return Promise.resolve({ id: 1, email, password } as User);
+      },
     };
     mockUsersService = {
       find: (email) => {
@@ -76,5 +78,16 @@ describe('UsersController', () => {
     // override method
     mockUsersService.findOne = () => null;
     await expect(controller.findUser(1)).rejects.toThrow(NotFoundException);
+  });
+
+  it('signin updates session object and return user', async () => {
+    const session = { userId: 0 };
+    const user = await controller.signInUser(
+      { email: 'mail@email.com', password: 'pass' },
+      session,
+    );
+
+    expect(user.id).toBe(1);
+    expect(session.userId).toEqual(1);
   });
 });
