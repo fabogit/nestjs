@@ -13,11 +13,6 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-    }),
-  );
   await app.listen(3000);
   console.log(`✅ Application is running on: ${await app.getUrl()}`);
 }
