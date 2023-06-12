@@ -1,5 +1,4 @@
 import { Expose, Transform } from 'class-transformer';
-import { User } from '../../users/user.entity';
 
 // fields to expose in the response
 export class ReportDto {
@@ -26,6 +25,9 @@ export class ReportDto {
 
   @Expose()
   mileage: number;
+
+  @Expose()
+  isApproved: boolean;
 
   // transform report entity, report.user.id will be userId
   @Transform(({ obj }) => obj.user.id)

@@ -33,6 +33,6 @@ export class ReportsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: ApproveReportDto,
   ) {
-    return { id, body };
+    return this.reportsService.changeApproval(id, body.isApproved);
   }
 }
