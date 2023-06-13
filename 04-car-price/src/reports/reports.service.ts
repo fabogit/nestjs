@@ -11,7 +11,9 @@ import { GetEstimateDto } from './dtos/get-estimate.dto';
 export class ReportsService {
   constructor(@InjectRepository(Report) private repo: Repository<Report>) {}
 
-  createEstimate(estimateDto: GetEstimateDto) {
+  createEstimate(
+    estimateDto: GetEstimateDto,
+  ): Promise<{ price: number | null }> {
     return this.repo
       .createQueryBuilder()
       .select('AVG(price)', 'price')
@@ -19,6 +21,7 @@ export class ReportsService {
       .andWhere('lng - :lng BETWEEN -5 AND 5', { lng: estimateDto.lng })
       .andWhere('lat - :lat BETWEEN -5 AND 5', { lat: estimateDto.lat })
       .andWhere('year - :year BETWEEN -3 AND 3', { year: estimateDto.year })
+      .andWhere('isApproved IS TRUE')
       .orderBy('ABS(mileage - :mileage)', 'DESC')
       .setParameters({ mileage: estimateDto.mileage })
       .limit(3)
