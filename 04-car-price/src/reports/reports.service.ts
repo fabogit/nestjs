@@ -14,9 +14,15 @@ export class ReportsService {
   createEstimate(estimateDto: GetEstimateDto) {
     return this.repo
       .createQueryBuilder()
-      .select('*')
+      .select('AVG(price)', 'price')
       .where('maker = :maker', { maker: estimateDto.maker })
-      .getRawMany();
+      .andWhere('lng - :lng BETWEEN -5 AND 5', { lng: estimateDto.lng })
+      .andWhere('lat - :lat BETWEEN -5 AND 5', { lat: estimateDto.lat })
+      .andWhere('year - :year BETWEEN -3 AND 3', { year: estimateDto.year })
+      .orderBy('ABS(mileage - :mileage)', 'DESC')
+      .setParameters({ mileage: estimateDto.mileage })
+      .limit(3)
+      .getRawOne();
   }
 
   create(reportDto: CreateReportDto, user: User) {
