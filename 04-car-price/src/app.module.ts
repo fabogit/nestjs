@@ -49,13 +49,16 @@ import { Report } from './reports/report.entity';
     },
   ],
 })
+
+// session middleware
 export class AppModule {
+  constructor(private configService: ConfigService) {}
   // Globally scoped Middleware
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
         session({
-          secret: 'session-secret',
+          secret: this.configService.get('COOKIE_KEY'),
           resave: false,
           saveUninitialized: false,
         }),
